@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hörverständnis & Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        .text-container, .quiz-container { max-width: 600px; margin: 20px auto; font-size: 18px; }
+        .controls { margin-top: 10px; }
+        button { font-size: 16px; padding: 10px; margin: 5px; cursor: pointer; }
+        .quiz-container { display: none; }
+        .question { font-weight: bold; }
+        .answer { display: block; margin: 5px; padding: 10px; cursor: pointer; border: 1px solid #000; }
+        .correct { background-color: lightgreen; }
+        .wrong { background-color: lightcoral; }
+        .blue-text { color: blue; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Hörverständnis: "Outsourced"</h2>
+    
+    <iframe id="soundcloudPlayer" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2091851211&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
+    </iframe>
+    
+    <div class="text-container" id="textContainer">
+        <p id="text"></p>
+    </div>
+    
+    <div class="controls">
+        <button id="prevButton">⬅️ Zurück</button>
+        <button id="nextButton">Weiter ➡️</button>
+    </div>
+    
+    <div class="quiz-container" id="quizContainer">
+        <p class="question" id="question"></p>
+        <div id="answers"></div>
+        <button id="nextQuestion">Nächste Frage ➡️</button>
+    </div>
+
+<script>
+    const textAbschnitte = [
+        "Der Papst ist das Oberhaupt (head/leader) der katholischen Kirche. Er lebt im Vatikan, einem kleinen Staat in der Stadt Rom. Der erste Papst war Petrus, ein Jünger (disciple) von Jesus Christus.",
+        "Die Christen glauben, dass Jesus ihm die Aufgabe gegeben hat, die Kirche zu führen. Petrus lebte im ersten Jahrhundert nach Christus.",
+        "Seitdem gab es über 260 Päpste. Im Mittelalter (Middle Ages) war der Papst sehr mächtig (powerful). Er hatte nicht nur religiöse, sondern auch politische Macht (power).",
+        "Viele Könige hörten auf den Papst und baten ihn um Hilfe. Manchmal gab es Streit zwischen Päpsten und Herrschern (rulers).",
+        "Im 16. Jahrhundert begann die Reformation. Martin Luther kritisierte die Kirche und den Papst. Viele Menschen verließen die katholische Kirche. Deshalb wurde der Papst weniger mächtig.",
+        "Papst Franziskus war von 2013 bis 2025 Papst. Er kam aus Argentinien und setzte sich ein (advocated) für Frieden, Gerechtigkeit und den Schutz der Umwelt.",
+        "Am Ostermontag, dem 21. April 2025, starb (died) er im Alter von 88 Jahren an den Folgen (consequences) eines Schlaganfalls (stroke).",
+        "Nach dem Tod eines Papstes beginnt das sogenannte (so-called) Konklave. Dabei wählen die Kardinäle der Kirche in der Sixtinischen Kapelle einen neuen Papst.",
+        "Die Wahl (election) ist geheim. Wenn weißer Rauch (smoke) aus dem Schornstein (chimney) steigt (rises), bedeutet das: Ein neuer Papst wurde gewählt.",
+        "Wenn schwarzer Rauch erscheint (appears), wurde noch kein Papst gefunden."
+    ];
+
+
+
+      const quizFragen = [
+    { frage: "Was bedeutet 'Oberhaupt' im Englischen?", antworten: ["A) Manager", "B) Head/Leader", "C) President"], korrekt: 1 },
+    { frage: "Was ist ein 'Jünger'?", antworten: ["A) Soldier", "B) Farmer", "C) Disciple"], korrekt: 2 },
+    { frage: "Was meint man mit 'Mittelalter'?", antworten: ["A) Modern Times", "B) Middle Ages", "C) Ancient Rome"], korrekt: 1 },
+    { frage: "Was bedeutet 'mächtig'?", antworten: ["A) Powerful", "B) Peaceful", "C) Famous"], korrekt: 0 },
+    { frage: "Was ist 'Macht'?", antworten: ["A) Strength", "B) Power", "C) Duty"], korrekt: 1 },
+    { frage: "Was bedeutet 'Herrscher'?", antworten: ["A) Leaders", "B) Judges", "C) Warriors"], korrekt: 0 },
+    { frage: "Was bedeutet 'sich einsetzen für'?", antworten: ["A) To stand in", "B) To advocate", "C) To argue"], korrekt: 1 },
+    { frage: "Was bedeutet 'starb'?", antworten: ["A) Cried", "B) Left", "C) Died"], korrekt: 2 },
+    { frage: "Was bedeutet 'Folgen' im Zusammenhang mit einer Krankheit?", antworten: ["A) Results", "B) Directions", "C) Consequences"], korrekt: 2 },
+    { frage: "Was ist ein 'Schlaganfall'?", antworten: ["A) Stroke", "B) Heart attack", "C) Broken bone"], korrekt: 0 },
+    { frage: "Was bedeutet 'sogenannt'?", antworten: ["A) Well-known", "B) So-called", "C) Traditional"], korrekt: 1 },
+    { frage: "Was bedeutet 'Wahl'?", antworten: ["A) Voice", "B) Vote", "C) Election"], korrekt: 2 },
+    { frage: "Was ist 'Rauch'?", antworten: ["A) Fog", "B) Dust", "C) Smoke"], korrekt: 2 },
+    { frage: "Was bedeutet 'Schornstein'?", antworten: ["A) Steeple", "B) Chimney", "C) Tower"], korrekt: 1 },
+    { frage: "Was bedeutet 'steigt'?", antworten: ["A) Falls", "B) Rises", "C) Waits"], korrekt: 1 },
+    { frage: "Was bedeutet 'erscheint'?", antworten: ["A) Appears", "B) Hides", "C) Moves"], korrekt: 0 }
+];
+
+
+        let currentIndex = 0;
+        let quizIndex = 0;
+        let richtigeAntworten = 0;
+
+        document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
+
+        document.getElementById("nextButton").addEventListener("click", function() {
+            if (currentIndex < textAbschnitte.length - 1) {
+                currentIndex++;
+                document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
+            } else {
+                document.getElementById("textContainer").style.display = "none";
+                document.querySelector(".controls").style.display = "none";
+                document.getElementById("quizContainer").style.display = "block";
+                ladeFrage();
+            }
+        });
+
+        document.getElementById("prevButton").addEventListener("click", function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
+            }
+        });
+
+        function ladeFrage() {
+            if (quizIndex < quizFragen.length) {
+                document.getElementById("question").innerText = quizFragen[quizIndex].frage;
+                const answerContainer = document.getElementById("answers");
+                answerContainer.innerHTML = "";
+
+                quizFragen[quizIndex].antworten.forEach((antwort, index) => {
+                    let button = document.createElement("button");
+                    button.innerText = antwort;
+                    button.classList.add("answer");
+                    button.addEventListener("click", function() {
+                        if (index === quizFragen[quizIndex].korrekt) {
+                            button.classList.add("correct");
+                            richtigeAntworten++;
+                        } else {
+                            button.classList.add("wrong");
+                        }
+                        setTimeout(() => {
+                            quizIndex++;
+                            ladeFrage();
+                        }, 1000);
+                    });
+                    answerContainer.appendChild(button);
+                });
+            } else {
+                document.getElementById("quizContainer").innerHTML = "<h3>Quiz beendet!</h3><p>Du hast " + richtigeAntworten + " von " + quizFragen.length + " Fragen richtig beantwortet.</p>";
+            }
+        }
+
+        document.getElementById("nextQuestion").addEventListener("click", function() {
+            quizIndex++;
+            ladeFrage();
+        });
+    </script>
+</body>
+</html>
