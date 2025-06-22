@@ -1,138 +1,431 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hörverständnis & Quiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        .text-container, .quiz-container { max-width: 600px; margin: 20px auto; font-size: 18px; }
-        .controls { margin-top: 10px; }
-        button { font-size: 16px; padding: 10px; margin: 5px; cursor: pointer; }
-        .quiz-container { display: none; }
-        .question { font-weight: bold; }
-        .answer { display: block; margin: 5px; padding: 10px; cursor: pointer; border: 1px solid #000; }
-        .correct { background-color: lightgreen; }
-        .wrong { background-color: lightcoral; }
-        .blue-text { color: blue; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hörverständnis & Quiz</title>
+ 
+ <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: black;
+      color: white;
+    }
+
+    .text-container, .quiz-container, .result-container {
+      max-width: 600px;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .controls {
+      margin-top: 10px;
+    }
+
+    button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      #prevButton:hover,
+      #nextButton:hover,
+      #prevQuestion:hover,
+      #nextQuestion:hover,
+      #zurueckZumTextButton:hover,
+      #goToQuizButton:hover,
+      #backToTextFromResult:hover {
+        background-color: #e0e0e0;
+        color: black;
+      }
+    }
+
+    .quiz-container, .result-container {
+      display: none;
+    }
+
+    .question {
+      font-weight: bold;
+    }
+
+    .answer {
+      display: block;
+      margin: 5px;
+      padding: 10px;
+      cursor: pointer;
+      border: 1px solid #fff;
+      background-color: #222;
+      color: white;
+    }
+
+    .correct {
+      background-color: lightgreen;
+      color: black;
+    }
+
+    .wrong {
+      background-color: lightcoral;
+      color: black;
+    }
+
+    .blue-text {
+      color: lightgreen;
+      font-weight: bold;
+    }
+
+    .icon-links img {
+      width: 50px;
+      height: 50px;
+      margin: 10px;
+      cursor: pointer;
+      background-color: white;
+      border-radius: 50%;
+      padding: 5px;
+    }
+
+    .icon-links a {
+      display: inline-block;
+      text-decoration: none;
+      color: #ffcc00;
+      text-align: center;
+      margin: 10px;
+      font-weight: bold;
+    }
+
+    .icon-links p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+
+    #progressContainer, #quizProgressContainer {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .progress-bar-background {
+      background-color: #555;
+      height: 10px;
+      width: 100%;
+      border-radius: 5px;
+    }
+
+    .progress-bar-fill {
+      height: 10px;
+      background-color: #4caf50;
+      border-radius: 5px;
+      width: 0%;
+    }
+
+    #goToQuizButton, .zurueck-button, #backToTextFromResult {
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+  </style>
+
 </head>
 <body>
-    <h2>Hörverständnis: "der Papst"</h2>
-    
-    <iframe id="soundcloudPlayer" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2091851211&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
-    </iframe>
-    
-    <div class="text-container" id="textContainer">
-        <p id="text"></p>
+  <h2>Jazz Up Your German © "Hunger Games"</h2>
+
+  <iframe id="soundcloudPlayer" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2095607442&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
+  </iframe>
+
+  <div id="progressContainer">
+    <div class="progress-bar-background">
+      <div id="progressBar" class="progress-bar-fill"></div>
     </div>
-    
-    <div class="controls">
-        <button id="prevButton">⬅️ Zurück</button>
-        <button id="nextButton">Weiter ➡️</button>
+  </div>
+
+  <div class="text-container" id="textContainer">
+    <p id="text"></p>
+  </div>
+
+  <div class="controls">
+    <button id="prevButton">⬅️ Zurück</button>
+    <button id="nextButton">Weiter ➡️</button>
+    <button id="goToQuizButton">Zum Quiz</button>
+  </div>
+
+  <div class="quiz-container" id="quizContainer">
+    <div id="quizProgressContainer">
+      <div class="progress-bar-background">
+        <div id="quizProgressBar" class="progress-bar-fill"></div>
+      </div>
     </div>
-    
-    <div class="quiz-container" id="quizContainer">
-        <p class="question" id="question"></p>
-        <div id="answers"></div>
+    <p class="question" id="question"></p>
+    <div id="answers"></div>
+    <div class="quiz-buttons">
+      <button class="zurueck-button" id="zurueckZumTextButton">🔁 Zurück zum Text</button>
+      <div>
+        <button id="prevQuestion">⬅️ Vorherige Frage</button>
         <button id="nextQuestion">Nächste Frage ➡️</button>
+      </div>
     </div>
+  </div>
+
+  <div class="result-container" id="resultContainer">
+    <h3>Test abgeschlossen!</h3>
+    <p id="score"></p>
+    <div class="icon-links">
+      <a href="https://www.jazzupyourgerman.com" target="_blank">
+        <img src="https://img.icons8.com/ios-filled/100/000000/domain.png" alt="Webseite"/>
+        <p>➡️ Go to website</p>
+      </a><br>
+      <a href="https://www.instagram.com/jazzupyourgerman" target="_blank">
+        <img src="https://img.icons8.com/ios-filled/100/000000/instagram-new.png" alt="Instagram"/>
+        <p>➡️ Follow JAZZ UP YOUR GERMAN on Instagram!</p>
+      </a>
+    </div>
+    <button id="backToTextFromResult">🔁 Zurück zum Text</button>
+  </div>
 
 <script>
-    const textAbschnitte = [
-        "Der Papst ist das Oberhaupt (head/leader) der katholischen Kirche. Er lebt im Vatikan, einem kleinen Staat in der Stadt Rom. Der erste Papst war Petrus, ein Jünger (disciple) von Jesus Christus.",
-        "Die Christen glauben, dass Jesus ihm die Aufgabe gegeben hat, die Kirche zu führen. Petrus lebte im ersten Jahrhundert nach Christus.",
-        "Seitdem gab es über 260 Päpste. Im Mittelalter (Middle Ages) war der Papst sehr mächtig (powerful). Er hatte nicht nur religiöse, sondern auch politische Macht (power).",
-        "Viele Könige hörten auf den Papst und baten ihn um Hilfe. Manchmal gab es Streit zwischen Päpsten und Herrschern (rulers).",
-        "Im 16. Jahrhundert begann die Reformation. Martin Luther kritisierte die Kirche und den Papst. Viele Menschen verließen die katholische Kirche. Deshalb wurde der Papst weniger mächtig.",
-        "Papst Franziskus war von 2013 bis 2025 Papst. Er kam aus Argentinien und setzte sich ein (advocated for) für Frieden, Gerechtigkeit und den Schutz der Umwelt.",
-        "Am Ostermontag, dem 21. April 2025, starb (died) er im Alter von 88 Jahren an den Folgen (consequences) eines Schlaganfalls (stroke).",
-        "Nach dem Tod eines Papstes beginnt das sogenannte (so-called) Konklave. Dabei wählen die Kardinäle der Kirche in der Sixtinischen Kapelle einen neuen Papst.",
-        "Die Wahl (election) ist geheim. Wenn weißer Rauch (smoke) aus dem Schornstein (chimney) steigt (rises), bedeutet das: Ein neuer Papst wurde gewählt.",
-        "Wenn schwarzer Rauch erscheint (appears), wurde noch kein Papst gefunden."
-    ];
+const textAbschnitte = [
+  "Die RAF, das heißt Rote Armee Fraktion, war eine linksextreme Terrorgruppe in Deutschland. Sie war besonders in den 1970er- und 1980er-Jahren aktiv. Die RAF kämpfte gegen den Staat (state) und gegen das, was sie als „Kapitalismus“ und „Unterdrückung“ (oppression) sah. Viele Menschen in Deutschland hatten Angst (fear) vor ihr. Die Geschichte der RAF ist ein wichtiger Teil der deutschen Nachkriegsgeschichte (post-war history).",
 
+  "Die RAF entstand (was formed) in den späten 1960er-Jahren. Damals gab es viele Proteste (protests) in Deutschland. Besonders junge Menschen waren unzufrieden (dissatisfied). Sie wollten eine neue Gesellschaft (society), ohne Krieg (war), Ungerechtigkeit (injustice) und Macht (power) der Reichen. Der Vietnamkrieg der USA und die schlechte Aufarbeitung (processing/dealing with) der Nazi-Zeit machten viele wütend (angry).",
 
+  "Einige von ihnen wollten nicht nur protestieren, sondern kämpfen (to fight). Sie glaubten, der Staat sei „faschistisch“ – also böse (evil) und undemokratisch. Sie dachten, Gewalt (violence) sei ein Mittel (means), um den Staat zu ändern. Die wichtigsten Gründer (founders) der RAF waren Andreas Baader, Gudrun Ensslin, Ulrike Meinhof und Holger Meins.",
 
-      const quizFragen = [
-    { frage: "Was bedeutet 'Oberhaupt' im Englischen?", antworten: ["A) Manager", "B) Head/Leader", "C) President"], korrekt: 1 },
-    { frage: "Was ist ein 'Jünger'?", antworten: ["A) Soldier", "B) Farmer", "C) Disciple"], korrekt: 2 },
-    { frage: "Was meint man mit 'Mittelalter'?", antworten: ["A) Modern Times", "B) Middle Ages", "C) Ancient Rome"], korrekt: 1 },
-    { frage: "Was bedeutet 'mächtig'?", antworten: ["A) Powerful", "B) Peaceful", "C) Famous"], korrekt: 0 },
-    { frage: "Was ist 'Macht'?", antworten: ["A) Strength", "B) Power", "C) Duty"], korrekt: 1 },
-    { frage: "Was bedeutet 'Herrscher'?", antworten: ["A) Leaders", "B) Judges", "C) Warriors"], korrekt: 0 },
-    { frage: "Was bedeutet 'sich einsetzen für'?", antworten: ["A) To stand in", "B) To advocate", "C) To argue"], korrekt: 1 },
-    { frage: "Was bedeutet 'starb'?", antworten: ["A) Cried", "B) Left", "C) Died"], korrekt: 2 },
-    { frage: "Was bedeutet 'Folgen' im Zusammenhang mit einer Krankheit?", antworten: ["A) Results", "B) Directions", "C) Consequences"], korrekt: 2 },
-    { frage: "Was ist ein 'Schlaganfall'?", antworten: ["A) Stroke", "B) Heart attack", "C) Broken bone"], korrekt: 0 },
-    { frage: "Was bedeutet 'sogenannt'?", antworten: ["A) Well-known", "B) So-called", "C) Traditional"], korrekt: 1 },
-    { frage: "Was bedeutet 'Wahl'?", antworten: ["A) Voice", "B) Vote", "C) Election"], korrekt: 2 },
-    { frage: "Was ist 'Rauch'?", antworten: ["A) Fog", "B) Dust", "C) Smoke"], korrekt: 2 },
-    { frage: "Was bedeutet 'Schornstein'?", antworten: ["A) Steeple", "B) Chimney", "C) Tower"], korrekt: 1 },
-    { frage: "Was bedeutet 'steigt'?", antworten: ["A) Falls", "B) Rises", "C) Waits"], korrekt: 1 },
-    { frage: "Was bedeutet 'erscheint'?", antworten: ["A) Appears", "B) Hides", "C) Moves"], korrekt: 0 }
+  "Sie waren jung, intelligent und sehr politisch. Am Anfang verübten (committed) sie Banküberfälle (bank robberies), um Geld zu bekommen. Später folgten Bombenanschläge (bomb attacks) auf Gebäude (buildings) von Polizei, Militär oder großen Firmen. 1970 begann die erste Phase (phase) der RAF. Die Mitglieder (members) trainierten in Palästina den bewaffneten Kampf (armed fight).",
+
+  "Zurück in Deutschland führten sie Terroranschläge (terror attacks) durch. 1972 gab es die erste große Angriffswelle (wave of attacks): Bomben explodierten in US-Stützpunkten (bases) und beim Bundeskriminalamt (federal criminal police office). Der Staat reagierte hart (harshly). Viele RAF-Mitglieder wurden verhaftet (arrested). In den Gefängnissen (prisons) protestierten sie mit Hungerstreiks (hunger strikes).",
+
+  "1974 starb Holger Meins an den Folgen eines Hungerstreiks. Das machte die Gruppe noch radikaler (more radical). Ein besonders dramatischer Moment war der „Deutsche Herbst“ im Jahr 1977. Die RAF wollte ihre gefangenen Mitglieder freipressen (free by force). Sie entführten (kidnapped) den Arbeitgeberpräsidenten Hanns Martin Schleyer und später ein Flugzeug der Lufthansa.",
+
+  "Das Flugzeug wurde von einer Spezialeinheit (special unit) in Somalia befreit (freed). Kurz danach fanden sich drei RAF-Mitglieder tot (dead) in ihren Gefängniszellen (prison cells). Die RAF sagte, sie seien ermordet (murdered) worden. Der Staat sagte, es war Selbstmord (suicide). Die Wahrheit (truth) ist bis heute nicht ganz klar.",
+
+  "Die RAF hörte nach 1977 nicht auf (did not stop). In den 1980er- und 1990er-Jahren gab es weitere Anschläge (attacks) und Morde (murders). Es entstanden neue „Generationen“ der RAF. Die Mitglieder kannten sich kaum (barely) noch persönlich. Doch sie kämpften weiter im Untergrund (underground).",
+
+  "Nach dem Ende des Kalten Krieges und der Wiedervereinigung (reunification) verlor die RAF an Bedeutung (importance). Die Welt hatte sich verändert (changed). 1998 erklärte die RAF offiziell: „Wir hören auf“ (We’re stopping). Die RAF war eine der gefährlichsten (most dangerous) Terrorgruppen in der Geschichte Deutschlands.",
+
+  "Sie tötete über 30 Menschen, darunter Polizisten (police officers), Politiker (politicians), Richter (judges) und Unternehmer (businessmen). Viele Menschen fragen sich: Wie konnte das passieren (happen)? Wie konnten junge, gebildete (educated) Menschen zu Terroristen werden? Bis heute wird über die RAF diskutiert – in Filmen, Büchern und Schulen.",
+
+  "Manche sehen in ihr ein Symbol für den Kampf gegen Ungerechtigkeit. Andere sagen, sie war eine brutale (brutal) Mörderbande (gang of killers). Klar ist: Die RAF hat die Bundesrepublik stark beeinflusst – politisch, gesellschaftlich (socially) und emotional. Die RAF war mehr als nur eine Terrorgruppe.",
+
+  "Sie war ein Teil einer Zeit, in der viele Menschen nach Veränderungen (change) suchten. Doch der Weg der Gewalt war falsch (wrong). Die Geschichte der RAF zeigt, wie wichtig Demokratie, Freiheit (freedom) und Dialog (dialogue) sind – und wie gefährlich Extremismus (extremism) sein kann."
 ];
 
 
-        let currentIndex = 0;
-        let quizIndex = 0;
-        let richtigeAntworten = 0;
 
-        document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
+ const quizFragen = [
+  { frage: "Was bedeutet 'Unterdrückung'?", antworten: ["A) Gerechtigkeit", "B) Kontrolle und Benachteiligung", "C) Freiheit"], korrekt: 1 },
+  { frage: "Was ist ein 'Terroranschlag'?", antworten: ["A) Eine Friedensdemonstration", "B) Eine politische Rede", "C) Ein gewaltsamer Angriff aus politischen Gründen"], korrekt: 2 },
+  { frage: "Was ist ein 'Banküberfall'?", antworten: ["A) Eine Spende an die Bank", "B) Ein Diebstahl in einer Bank", "C) Eine Bankgründung"], korrekt: 1 },
+  { frage: "Was bedeutet 'Nachkriegsgeschichte'?", antworten: ["A) Geschichte vor dem Krieg", "B) Geschichte des Krieges", "C) Geschichte nach dem Krieg"], korrekt: 2 },
+  { frage: "Was bedeutet 'bewaffneter Kampf'?", antworten: ["A) Diskussionen mit Politikern", "B) Kampf mit Waffen", "C) Sportlicher Wettbewerb"], korrekt: 1 },
+  { frage: "Was bedeutet 'faschistisch'?", antworten: ["A) Demokratisch", "B) Sozial", "C) Diktatorisch und unterdrückend"], korrekt: 2 },
+  { frage: "Was ist ein 'Hungerstreik'?", antworten: ["A) Ein Verzicht auf Essen als Protest", "B) Eine Diät", "C) Ein Volksfest"], korrekt: 0 },
+  { frage: "Was bedeutet 'radikal'?", antworten: ["A) Oberflächlich", "B) Extreme politische Haltung", "C) Uninteressiert"], korrekt: 1 },
+  { frage: "Was ist eine 'Spezialeinheit'?", antworten: ["A) Eine normale Polizeiabteilung", "B) Eine militärische Elitegruppe", "C) Eine Schulklasse"], korrekt: 1 },
+  { frage: "Was ist ein 'Anschlag'?", antworten: ["A) Eine Einladung", "B) Eine Rede", "C) Ein Angriff"], korrekt: 2 },
+  { frage: "Was bedeutet 'verhaftet'?", antworten: ["A) Freigelassen", "B) Gefördert", "C) Gefangen genommen"], korrekt: 2 },
+  { frage: "Was ist ein 'Richter'?", antworten: ["A) Ein Lehrer", "B) Eine Person, die im Gericht entscheidet", "C) Ein Journalist"], korrekt: 1 },
+  { frage: "Was bedeutet 'Gesellschaft'?", antworten: ["A) Einzelperson", "B) Gemeinschaft von Menschen", "C) Krieg"], korrekt: 1 },
+  { frage: "Was ist ein 'Flugzeug'?", antworten: ["A) Ein Fahrzeug auf der Straße", "B) Ein Boot", "C) Ein Transportmittel in der Luft"], korrekt: 2 },
+  { frage: "Was bedeutet 'gewaltsam'?", antworten: ["A) Friedlich", "B) Ruhig", "C) Mit Gewalt"], korrekt: 2 },
+  { frage: "Was ist ein 'Unternehmer'?", antworten: ["A) Ein Künstler", "B) Ein Geschäftsmann", "C) Ein Schüler"], korrekt: 1 },
+  { frage: "Was bedeutet 'Selbstmord'?", antworten: ["A) Mord an jemand anderem", "B) Freitod", "C) Überfall"], korrekt: 1 },
+  { frage: "Was bedeutet 'gebildet'?", antworten: ["A) Dumm", "B) Ohne Ausbildung", "C) Mit guter Bildung"], korrekt: 2 },
+  { frage: "Was ist 'Extremismus'?", antworten: ["A) Gemäßigte Meinung", "B) Politischer Sport", "C) Radikale politische Haltung"], korrekt: 2 },
+  { frage: "Was bedeutet 'Reich' in diesem Kontext?", antworten: ["A) Ein geografisches Gebiet", "B) Personen mit viel Geld", "C) Arme Menschen"], korrekt: 1 }
+];
 
-        document.getElementById("nextButton").addEventListener("click", function() {
-            if (currentIndex < textAbschnitte.length - 1) {
-                currentIndex++;
-                document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
-            } else {
-                document.getElementById("textContainer").style.display = "none";
-                document.querySelector(".controls").style.display = "none";
-                document.getElementById("quizContainer").style.display = "block";
-                ladeFrage();
-            }
-        });
 
-        document.getElementById("prevButton").addEventListener("click", function() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                document.getElementById("text").innerHTML = textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
-            }
-        });
+let currentIndex = 0;
+let quizIndex = 0;
+let richtigeAntworten = 0;
 
-        function ladeFrage() {
-            if (quizIndex < quizFragen.length) {
-                document.getElementById("question").innerText = quizFragen[quizIndex].frage;
-                const answerContainer = document.getElementById("answers");
-                answerContainer.innerHTML = "";
+function updateTextProgress() {
+  const percent = ((currentIndex + 1) / textAbschnitte.length) * 100;
+  document.getElementById("progressBar").style.width = percent + "%";
+}
 
-                quizFragen[quizIndex].antworten.forEach((antwort, index) => {
-                    let button = document.createElement("button");
-                    button.innerText = antwort;
-                    button.classList.add("answer");
-                    button.addEventListener("click", function() {
-                        if (index === quizFragen[quizIndex].korrekt) {
-                            button.classList.add("correct");
-                            richtigeAntworten++;
-                        } else {
-                            button.classList.add("wrong");
-                        }
-                        setTimeout(() => {
-                            quizIndex++;
-                            ladeFrage();
-                        }, 1000);
-                    });
-                    answerContainer.appendChild(button);
-                });
-            } else {
-                document.getElementById("quizContainer").innerHTML = "<h3>Quiz beendet!</h3><p>Du hast " + richtigeAntworten + " von " + quizFragen.length + " Fragen richtig beantwortet.</p>";
-            }
+function ladeText() {
+  document.getElementById("text").innerHTML =
+    textAbschnitte[currentIndex].replace(/\(([^)]+)\)/g, '<span class="blue-text">($1)</span>');
+  updateTextProgress();
+  document.getElementById("nextButton").style.display = currentIndex >= textAbschnitte.length - 1 ? "none" : "inline-block";
+}
+
+ladeText();
+
+document.getElementById("nextButton").addEventListener("click", () => {
+  if (currentIndex < textAbschnitte.length - 1) {
+    currentIndex++;
+    ladeText();
+  }
+});
+
+document.getElementById("prevButton").addEventListener("click", () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    ladeText();
+  }
+});
+
+document.getElementById("goToQuizButton").addEventListener("click", () => {
+  document.getElementById("textContainer").style.display = "none";
+  document.querySelector(".controls").style.display = "none";
+  document.getElementById("progressContainer").style.display = "none";
+  document.getElementById("quizContainer").style.display = "block";
+  ladeFrage();
+});
+
+function ladeFrage() {
+  if (quizIndex < quizFragen.length) {
+    document.getElementById("question").innerText = quizFragen[quizIndex].frage;
+    document.getElementById("quizProgressBar").style.width = ((quizIndex + 1) / quizFragen.length) * 100 + "%";
+
+    const answerContainer = document.getElementById("answers");
+    answerContainer.innerHTML = "";
+
+    quizFragen[quizIndex].antworten.forEach((antwort, index) => {
+      const button = document.createElement("button");
+      button.innerText = antwort;
+      button.classList.add("answer");
+      button.addEventListener("click", () => {
+        if (index === quizFragen[quizIndex].korrekt) {
+          button.classList.add("correct");
+          richtigeAntworten++;
+        } else {
+          button.classList.add("wrong");
         }
+        Array.from(answerContainer.children).forEach(btn => btn.disabled = true);
+      });
+      answerContainer.appendChild(button);
+    });
+  } else {
+    zeigeErgebnis();
+  }
+}
 
-        document.getElementById("nextQuestion").addEventListener("click", function() {
-            quizIndex++;
-            ladeFrage();
-        });
-    </script>
+
+
+function ladeFrage() {
+  if (quizIndex < quizFragen.length) {
+    document.getElementById("question").innerText = quizFragen[quizIndex].frage;
+    document.getElementById("quizProgressBar").style.width = ((quizIndex + 1) / quizFragen.length) * 100 + "%";
+
+    const answerContainer = document.getElementById("answers");
+    answerContainer.innerHTML = "";
+
+    quizFragen[quizIndex].antworten.forEach((antwort, index) => {
+      const button = document.createElement("button");
+      button.innerText = antwort;
+      button.classList.add("answer");
+
+      button.addEventListener("click", () => {
+        // Alle Buttons deaktivieren
+        Array.from(answerContainer.children).forEach(btn => btn.disabled = true);
+
+        // Wenn richtige Antwort gewählt
+        if (index === quizFragen[quizIndex].korrekt) {
+          button.classList.add("correct");
+          richtigeAntworten++;
+        } else {
+          button.classList.add("wrong");
+          // Richtige Antwort zusätzlich markieren
+          answerContainer.children[quizFragen[quizIndex].korrekt].classList.add("correct");
+        }
+      });
+
+      answerContainer.appendChild(button);
+    });
+  } else {
+    zeigeErgebnis();
+  }
+}
+
+
+
+
+document.getElementById("nextQuestion").addEventListener("click", () => {
+  if (quizIndex < quizFragen.length - 1) {
+    quizIndex++;
+    ladeFrage();
+  } else {
+    zeigeErgebnis();
+  }
+});
+
+document.getElementById("prevQuestion").addEventListener("click", () => {
+  if (quizIndex > 0) {
+    quizIndex--;
+    ladeFrage();
+  }
+});
+
+document.getElementById("zurueckZumTextButton").addEventListener("click", () => {
+  document.getElementById("quizContainer").style.display = "none";
+  document.getElementById("textContainer").style.display = "block";
+  document.querySelector(".controls").style.display = "block";
+  document.getElementById("progressContainer").style.display = "block";
+  ladeText();
+  updateTextProgress();
+});
+
+document.getElementById("backToTextFromResult").addEventListener("click", () => {
+  document.getElementById("resultContainer").style.display = "none";
+  document.getElementById("textContainer").style.display = "block";
+  document.querySelector(".controls").style.display = "block";
+  document.getElementById("progressContainer").style.display = "block";
+  currentIndex = 0;
+  ladeText();
+});
+
+function zeigeErgebnis() {
+  document.getElementById("quizContainer").style.display = "none";
+  document.getElementById("resultContainer").style.display = "block";
+  document.getElementById("score").innerText = `Du hast ${richtigeAntworten} von ${quizFragen.length} Fragen richtig beantwortet.`;
+}
+
+// Swipe-Funktion für Text- und Quiz-Container
+let startX = 0;
+let endX = 0;
+
+function handleTouchStart(e) {
+  startX = e.changedTouches[0].screenX;
+}
+
+function handleTouchEnd(e) {
+  endX = e.changedTouches[0].screenX;
+  handleGesture();
+}
+
+function handleGesture() {
+  const diffX = endX - startX;
+  if (Math.abs(diffX) > 50) {
+    if (diffX > 0) {
+      // Swipe nach rechts → zurück
+      if (document.getElementById("textContainer").style.display !== "none") {
+        document.getElementById("prevButton").click();
+      } else if (document.getElementById("quizContainer").style.display !== "none") {
+        document.getElementById("prevQuestion").click();
+      }
+    } else {
+      // Swipe nach links → weiter
+      if (document.getElementById("textContainer").style.display !== "none") {
+        document.getElementById("nextButton").click();
+      } else if (document.getElementById("quizContainer").style.display !== "none") {
+        document.getElementById("nextQuestion").click();
+      }
+    }
+  }
+}
+
+// Event-Listener für Touch-Events
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchend", handleTouchEnd, false);
+</script>
+
+     
 </body>
 </html>
